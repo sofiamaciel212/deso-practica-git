@@ -64,13 +64,23 @@ public class ReservationService {
         reservation.calculatePrice(),
         request.date());
   }
-
+  
   // Ejercicio 1
   public List<Reservation> getReservationsByUser(
       List<Reservation> reservations, String username, UserDao userDao)
       throws UserNotFoundException, DataAccessException {
-    throw new UnsupportedOperationException("Ejercicio 1: implement getReservationsByUser");
-  }
+
+    User user = userDao.findByUsername(username)
+        .orElseThrow(() -> new UserNotFoundException(username));
+
+    return reservations.stream()
+        .filter(reservation ->
+            reservation.getOwner().getId().equals(user.getId()))
+        .sorted((r1, r2) ->
+            Double.compare(r2.calculatePrice(), r1.calculatePrice()))
+        .toList();
+      }
+  
 
   // Ejercicio 3
   public List<Reservation> getTopNMostExpensive(
